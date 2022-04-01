@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  portainer:
+    image: portainer/portainer:latest
+    container_name: music_portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - music_portainer:/data/
+
+  nginx:
+    image: nginx:latest
+    container_name: music_nginx
+    restart: always
+    ports:
+     - "80:80"
+#     - 443:443
+    volumes:
+     - ./conf.d/nginx/conf.d/:/etc/nginx/conf.d/
+#     - ./conf.d/nginx/ssl/:/etc/ssl/
+
+  mongo:
+    image: mongo:latest
+    container_name: music_mongo
+    restart: always
+    env_file: .env.d/mongo.env
+    volumes:
+      - music_mongo:/data/db
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: music_mongo-express
+    restart: always
+    env_file: .env.d/mongo-express.env
+    depends_on:
+      - mongo
+
+  app:
+    build: .
+    container_name: music_app
+    restart: always
+    env_file: .env.d/app.env
+    volumes:
+      - ./src/:/usr/app/
+      - type: bind
+        source: ./main.py
+        target: /usr/app/main.py
+        read_only: true
+    command: ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "6", "main:app"]
+
+volumes:
+  music_mongo:
+    external: true
+  music_portainer:
+    external: true

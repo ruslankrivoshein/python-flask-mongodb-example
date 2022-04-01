@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  portainer:
+    image: portainer/portainer:latest
+    container_name: music_portainer
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - music_portainer:/data/
+
+  mongo:
+    image: mongo:latest
+    container_name: music_mongo
+    restart: always
+    env_file: .env.d/mongo.env
+    ports:
+      - "27017:27017"
+    volumes:
+      - music_mongo:/data/db
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: music_mongo-express
+    restart: always
+    env_file: .env.d/mongo-express.env
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+
+volumes:
+  music_mongo:
+    external: true
+  music_portainer:
+    external: true

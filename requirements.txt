@@ -1,0 +1,9 @@
+coverage>=6.3.2
+Flask~=2.0.3
+Flask-PyMongo~=2.3.0
+gunicorn~=20.1.0
+pydantic~=1.9.0
+pymongo~=4.0.2
+pytest~=7.1.0
+pytest-mock-resources~=2.2.5
+python-dotenv~=0.19.2
